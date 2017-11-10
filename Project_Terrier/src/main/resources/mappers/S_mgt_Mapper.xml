@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="S_mgt_Mapper">
+	
+	<!-- 오늘날짜 계산하기 -->
+	<select id="nowdate" resultType="String">
+		select left(now(),10);
+	</select>
+
+	<!-- 기능별 제어현황 개수 - on인지 off인지 개수 출력 -->
+	<select id="control_status_count" resultType="com.terrier.domain.Control_count_VO">
+		SELECT 
+			COUNT(CASE WHEN Wifi=#{status} THEN 1 END) AS wifi,
+		    COUNT(CASE WHEN Bluetooth=#{status} THEN 1 END) AS bluetooth,
+		    COUNT(CASE WHEN Tethering=#{status} THEN 1 END) AS tethering,
+		    COUNT(CASE WHEN Camera=#{status} THEN 1 END) AS camera,
+		    COUNT(CASE WHEN VoiceRecord=#{status} THEN 1 END) AS voiceRecord
+		FROM device_management;
+	</select>
+
+	<select id="department_control_on" resultType="int">
+		SELECT 
+			COUNT(CASE WHEN Wifi='on' THEN 1 END)
+			+ COUNT(CASE WHEN Bluetooth='on' THEN 1 END)
+			+ COUNT(CASE WHEN Tethering='on' THEN 1 END)
+			+ COUNT(CASE WHEN Camera='on' THEN 1 END)
+			+ COUNT(CASE WHEN VoiceRecord='on' THEN 1 END)
+		FROM device_management
+		INNER JOIN device_info ON device_management.Device_info_Id = device_info.Id
+		INNER JOIN user_info ON device_info.User_info_employee_num = user_info.employee_num
+		WHERE user_info.Department = #{department};
+	</select>
+	
+	<select id="department_control_status" resultType="com.terrier.domain.Control_count_VO">
+	SELECT 
+		COUNT(CASE WHEN Wifi=#{status} THEN 1 END) AS wifi,
+	    COUNT(CASE WHEN Bluetooth=#{status} THEN 1 END) AS bluetooth,
+	    COUNT(CASE WHEN Tethering=#{status} THEN 1 END) AS tethering,
+	    COUNT(CASE WHEN Camera=#{status} THEN 1 END) AS camera,
+	    COUNT(CASE WHEN VoiceRecord=#{status} THEN 1 END) AS voiceRecord
+	FROM device_management
+	INNER JOIN device_info ON device_management.Device_info_Id = device_info.Id
+	INNER JOIN user_info ON device_info.User_info_employee_num = user_info.employee_num
+	WHERE user_info.Department = #{department};
+	</select>
+	
+	<!--날짜별 통계자료 DB 참조-->
+	
+	<!-- 해당날짜 ON,OFF정보 -->
+	<select id="date_control_status_on_off" resultType="com.terrier.domain.Control_count_VO">
+	SELECT 
+		Count(case when type='Wifi' then 1 end) as wifi,
+		Count(case when type='Bluetooth' then 1 end) as bluetooth,
+		COUNT(CASE WHEN type='Tethering' then 1 END) as tethering,
+		Count(case when type='Camera' then 1 end) as camera,
+		Count(case when type='VoiceRecord' then 1 end) as voiceRecord 
+	FROM control_history
+	where left(Date,10)=#{date} and history=#{controller};			
+	</select>
+	
+	<select id="dep_date_control_status_on_off" resultType="com.terrier.domain.Control_count_VO">
+	select 
+		Count(case when type='Wifi' then 1 end) as wifi,
+		Count(case when type='Bluetooth' then 1 end) as bluetooth,
+		Count(case when type='Tethering' then 1 end) as tethering,
+		Count(case when type='Camera' then 1 end) as camera,
+		Count(case when type='VoiceRecord' then 1 end) as voiceRecord 
+	from control_history
+		inner join device_info ON control_history.Device_info_Id=device_info.Id
+		inner join user_info ON device_info.User_info_employee_num=user_info.employee_num
+	where user_info.Department=#{dep} 
+			and left(control_history.Date,10)=#{date} 
+			and control_history.history=#{controller};	
+	
+	</select>
+	
+</mapper>

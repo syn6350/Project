@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="l_mgt_Mapper">
+	<select id="l_controller" resultType="L_mgt_controller_VO">
+		SELECT device_management.Alarm AS alarm, device_management.Gps AS gps
+		FROM user_info
+		INNER JOIN device_info ON user_info.employee_num = device_info.User_info_employee_num
+		INNER JOIN device_management ON device_info.Id = device_management.Device_info_Id
+		WHERE employee_num=#{employee_num};
+	</select>
+</mapper>
