@@ -13,7 +13,7 @@ public class Main_Controller
 	@RequestMapping("logout")//main->·Î±×¾Æ¿ô ´­·¶À»¶§
 	public String logout(HttpSession session,RedirectAttributes rttr)
 	{
-		session.invalidate();
+		session.invalidate();// ¼¼¼Ç
 		rttr.addFlashAttribute("msg","logout");
 		return "redirect:/user/login";
 	}
